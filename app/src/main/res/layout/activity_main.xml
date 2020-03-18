@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F0F0F0"
+        tools:context=".MainActivity">
+
+        <androidx.gridlayout.widget.GridLayout
+            android:id="@+id/grid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:columnCount="3"
+            app:layout_constraintBottom_toTopOf="@+id/guideline2"
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toStartOf="@+id/guideline3">
+
+            <ImageButton
+                android:id="@+id/btn1"
+                android:layout_width="70sp"
+                android:layout_height="50sp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/button1" />
+
+            <ImageButton
+                android:id="@+id/btn2"
+                android:layout_width="70sp"
+                android:layout_height="50sp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/button2" />
+
+            <ImageButton
+                android:id="@+id/btn3"
+                android:layout_width="70sp"
+                android:layout_height="50sp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/button3" />
+
+            <ImageButton
+                android:id="@+id/btn4"
+                android:layout_width="70sp"
+                android:layout_height="50sp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/button4" />
+
+            <ImageButton
+                android:id="@+id/btn5"
+                android:layout_width="70sp"
+                android:layout_height="50sp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/button5" />
+
+            <ImageButton
+                android:id="@+id/btn6"
+                android:layout_width="70sp"
+                android:layout_height="50sp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/button6" />
+
+            <ImageButton
+                android:id="@+id/btn7"
+                android:layout_width="70sp"
+                android:layout_height="50sp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/button7" />
+
+            <ImageButton
+                android:id="@+id/btn8"
+                android:layout_width="70sp"
+                android:layout_height="50sp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/button8" />
+
+            <ImageButton
+                android:id="@+id/btn9"
+                android:layout_width="70sp"
+                android:layout_height="50sp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/button9" />
+
+            <ImageButton
+                android:id="@+id/btn_del"
+                android:layout_width="70sp"
+                android:layout_height="50sp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/delbutton" />
+
+            <ImageButton
+                android:id="@+id/btn0"
+                android:layout_width="70sp"
+                android:layout_height="50sp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/button0" />
+
+            <ImageButton
+                android:id="@+id/btn_enter"
+                android:layout_width="70sp"
+                android:layout_height="50sp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/enterbutton" />
+        </androidx.gridlayout.widget.GridLayout>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="80sp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_end="80sp" />
+
+        <TextView
+            android:id="@+id/textid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30sp"
+            android:text="학번을 입력하세요"
+            android:textColor="#707070"
+            android:textSize="25sp"
+            app:layout_constraintBottom_toTopOf="@+id/getId"
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toStartOf="@+id/guideline3" />
+
+        <EditText
+            android:id="@+id/getId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20sp"
+            android:clickable="false"
+            android:ems="8"
+            android:gravity="center"
+            android:inputType="number"
+            android:maxEms="8"
+            android:maxLength="8"
+            android:maxLines="1"
+            android:textColor="#707070"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/grid"
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toStartOf="@+id/guideline3" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="50sp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="50sp" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/ani_view"
+            android:layout_width="150sp"
+            android:layout_height="150sp"
+            app:layout_constraintBottom_toTopOf="@+id/textid"
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toStartOf="@+id/guideline3"
+            app:layout_constraintTop_toBottomOf="@+id/data" />
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#707070"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline"
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toStartOf="@+id/guideline3"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#707070"
+            android:textSize="25sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
