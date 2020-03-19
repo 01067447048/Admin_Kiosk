@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             type_for_server = "등교";
         }
 
-        binding.data.setText(campus + " / " + bus_type + " / " + type);
+        binding.data.setText(campus + " / " + bus_type + " / " + type+"("+type_for_server+")");
 
         binding.btn0.setOnClickListener(view -> binding.getId.append("0"));
         binding.btn1.setOnClickListener(view -> binding.getId.append("1"));
