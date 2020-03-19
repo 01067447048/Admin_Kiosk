@@ -163,8 +163,8 @@ public class MainActivity extends AppCompatActivity {
         RequestService service = retrofit.create(RequestService.class);
         HashMap<String, Object> input = new HashMap<>();
         input.put("url", url);/*url*/
-        input.put("state", /*type_for_server*/"등교");
-        input.put("shuttle_stop_name", /*campus*/"아산캠퍼스");
+        input.put("state", type_for_server);
+        input.put("shuttle_stop_name", campus);
 
         service.shuttleBus(input).enqueue(new Callback<CheckMessage>() {
             @Override
