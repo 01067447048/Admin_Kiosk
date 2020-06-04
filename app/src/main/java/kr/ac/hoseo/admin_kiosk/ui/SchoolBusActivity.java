@@ -1,34 +1,29 @@
-package kr.ac.hoseo.admin_kiosk;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
+package kr.ac.hoseo.admin_kiosk.ui;
 
 import android.animation.Animator;
-import android.app.Activity;
 import android.content.Intent;
+import android.media.Ringtone;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
+import kr.ac.hoseo.admin_kiosk.MainActivity;
+import kr.ac.hoseo.admin_kiosk.R;
+import kr.ac.hoseo.admin_kiosk.RequestService;
+import kr.ac.hoseo.admin_kiosk.SSLUtil;
 import kr.ac.hoseo.admin_kiosk.data.CheckData;
-import kr.ac.hoseo.admin_kiosk.data.CheckMessage;
 import kr.ac.hoseo.admin_kiosk.data.SchoolQR;
-import kr.ac.hoseo.admin_kiosk.data.TicketDB;
 import kr.ac.hoseo.admin_kiosk.databinding.ActivityMainBinding;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,20 +31,23 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
-
+public class SchoolBusActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
-    private String student_id;
-    private String BASE_URL = "https://hub.hsu.ac.kr";
-    private String type, campus, bus_type, type_for_server;
+    private String url;
+    private String type, bus_type, type_for_server;
+    private int station;
     private Date current;
     private String time;
+    private String campus;
     private static Handler handler;
+    private Uri notification;
+    private Ringtone ringtone;
+    private String student_id;
 
+    private final String BASE_URL = "https://hub.hsu.ac.kr";
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         handler = new Handler() {
@@ -121,168 +119,9 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnEnter.setOnClickListener(view -> {
             student_id = binding.getId.getText().toString();
-            if (student_id.length() > 5) {
-                if (bus_type.equals("통학")) {
-                    usingStudentIdSchool(student_id);
-                } else {
-                    letsEncrypte(student_id);
-                }
-                binding.getId.setText("");
-            } else {
-                binding.getId.setError("학번을 확인해 주세요!");
-                binding.getId.setClickable(false);
-            }
-        });
-
-    }
-
-    private void letsEncrypte(String studentId) {
-
-        Date currentTime = Calendar.getInstance().getTime();
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss"); //형식 맞추기
-        String nowDate = format.format(currentTime);
-
-        try {
-            String result;
-            result = AES256Util.AES_Encode(studentId + nowDate); //이거를 QR로 만들어 제작하기
-            //TODO 30초마다 QR코드 리셋하
-            Log.d("TAGGING", result);
-            checkedshuttlelQR(result);
-        } catch (UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void checkedshuttlelQR(String url) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .client(SSLUtil.getUnsafeOkHttpClient().build())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RequestService service = retrofit.create(RequestService.class);
-        HashMap<String, Object> input = new HashMap<>();
-        input.put("url", url);/*url*/
-        input.put("state", type_for_server);
-        input.put("shuttle_stop_name", campus);
-
-        service.shuttleBus(input).enqueue(new Callback<CheckMessage>() {
-            @Override
-            public void onResponse(Call<CheckMessage> call, Response<CheckMessage> response) {
-                //CheckMessage message = response.body();
-                if (response.isSuccessful() && response.body().getMESSSAGE().equals("정상 탑승 되었습니다.")) { //==null
-                    Log.d("TAGGING", response.toString() + " / " + response.body().getMESSSAGE());
-                    Toast.makeText(MainActivity.this, response.body().getMESSSAGE(), Toast.LENGTH_SHORT).show();
-                    playCheck();
-                } else {
-                    Toast.makeText(MainActivity.this, response.body().getMESSSAGE(), Toast.LENGTH_SHORT).show();
-                    playError();
-                    Log.d("TAGGING", response.toString() + " / " + response.body().getMESSSAGE());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<CheckMessage> call, Throwable t) {
-                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d("TAGGING", "fail");
-                Log.e("ERROR", t.getMessage().toString());
-            }
+            usingStudentIdSchool(student_id);
         });
     }
-
-    private void usingStudentIdSchool(String sid) {
-
-        Date currentTime = Calendar.getInstance().getTime();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd"); //형식 맞추기
-        String now = format.format(currentTime);
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .client(SSLUtil.getUnsafeOkHttpClient().build())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RequestService service = retrofit.create(RequestService.class);
-        service.getTicket(sid).enqueue(new Callback<CheckData>() {
-            @Override
-            public void onResponse(Call<CheckData> call, Response<CheckData> response) {
-                if (response.isSuccessful()) {
-                    if (response.body().getTicketDB() == null) {
-                        playError();
-                        Toast.makeText(MainActivity.this, "오늘 티켓이 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Log.d("TIME", response.body().getTicketDB().getTICKET_DATE() + now);
-                        if (now.equals(response.body().getTicketDB().getTICKET_DATE())) {
-                            if ((response.body().getTicketDB().getSTART().equals("아산캠퍼스") || response.body().getTicketDB().getSTART().equals("천안캠퍼스")) && type_for_server.equals("하교")) {
-                                checkedshcoolQR(String.valueOf(response.body().getTicketDB().getTICKETID()));
-                            } else if ((response.body().getTicketDB().getEND().equals("아산캠퍼스") || response.body().getTicketDB().getEND().equals("천안캠퍼스")) && type_for_server.equals("등교")) {
-                                checkedshcoolQR(String.valueOf(response.body().getTicketDB().getTICKETID()));
-                            } else {
-                                playError();
-                                Toast.makeText(MainActivity.this, "승하차를 확인 해 주세요.", Toast.LENGTH_SHORT).show();
-                            }
-
-                        } else {
-                            playError();
-                            Toast.makeText(MainActivity.this, "오늘 티켓이 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                } else {
-                    Toast.makeText(MainActivity.this, "실패", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<CheckData> call, Throwable t) {
-                Log.d("TAG", t.getMessage());
-            }
-        });
-
-    }
-
-    private void checkedshcoolQR(String id) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .client(SSLUtil.getUnsafeOkHttpClient().build())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        RequestService service = retrofit.create(RequestService.class);
-
-        service.schoolBus(id).enqueue(new Callback<SchoolQR>() {
-            @Override
-            public void onResponse(Call<SchoolQR> call, Response<SchoolQR> response) {
-                if (response.isSuccessful()) {
-                    if(response.body().getMESSSAGE().equals("Cannot read property 'TICKET_TIME' of undefined")){
-                        playError();
-                        Toast.makeText(MainActivity.this,"오늘 티켓이 존재하지 않습니다.",Toast.LENGTH_SHORT).show();
-                    }
-                    else if(response.body().getMESSSAGE().equals("이미 탑승한 티켓입니다.")){
-                        playError();
-                        Toast.makeText(MainActivity.this,response.body().getMESSSAGE(),Toast.LENGTH_SHORT).show();
-                    }
-                    else if (response.body().getMESSSAGE().equals("티켓 탑승 날짜가 아닙니다.")){
-                        playError();
-                        Toast.makeText(MainActivity.this,response.body().getMESSSAGE(),Toast.LENGTH_SHORT).show();
-                    }
-                    else{
-                        playCheck();
-                    }
-                } else {
-                    Toast.makeText(MainActivity.this, "Checked Error", Toast.LENGTH_SHORT).show();
-                    playError();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<SchoolQR> call, Throwable t) {
-                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                playError();
-            }
-        });
-    }
-
     private void initAnimation() {
         binding.aniView.setAnimation("qr.json");
         binding.aniView.setMaxFrame(148);
@@ -343,6 +182,100 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAnimationRepeat(Animator animator) {
 
+            }
+        });
+    }
+
+    private void usingStudentIdSchool(String sid) {
+
+        Date currentTime = Calendar.getInstance().getTime();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd"); //형식 맞추기
+        String now = format.format(currentTime);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(SSLUtil.getUnsafeOkHttpClient().build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RequestService service = retrofit.create(RequestService.class);
+        service.getTicket(sid).enqueue(new Callback<CheckData>() {
+            @Override
+            public void onResponse(Call<CheckData> call, Response<CheckData> response) {
+                if (response.isSuccessful()) {
+                    if (response.body().getTicketDB() == null) {
+                        playError();
+                        Toast.makeText(SchoolBusActivity.this, "오늘 티켓이 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d("TIME", response.body().getTicketDB().getTICKET_DATE() + now);
+                        if (now.equals(response.body().getTicketDB().getTICKET_DATE())) {
+                            if ((response.body().getTicketDB().getSTART().equals("아산캠퍼스") || response.body().getTicketDB().getSTART().equals("천안캠퍼스")) && type_for_server.equals("하교")) {
+                                checkedshcoolQR(String.valueOf(response.body().getTicketDB().getTICKETID()));
+                            } else if ((response.body().getTicketDB().getEND().equals("아산캠퍼스") || response.body().getTicketDB().getEND().equals("천안캠퍼스")) && type_for_server.equals("등교")) {
+                                checkedshcoolQR(String.valueOf(response.body().getTicketDB().getTICKETID()));
+                            } else {
+                                playError();
+                                Toast.makeText(SchoolBusActivity.this, "승하차를 확인 해 주세요.", Toast.LENGTH_SHORT).show();
+                            }
+
+                        } else {
+                            playError();
+                            Toast.makeText(SchoolBusActivity.this, "오늘 티켓이 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                } else {
+                    Toast.makeText(SchoolBusActivity.this, "실패", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<CheckData> call, Throwable t) {
+                Log.d("TAG", t.getMessage());
+            }
+        });
+
+    }
+
+    private void checkedshcoolQR(String id) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(SSLUtil.getUnsafeOkHttpClient().build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RequestService service = retrofit.create(RequestService.class);
+
+        service.schoolBus(id).enqueue(new Callback<SchoolQR>() {
+            @Override
+            public void onResponse(Call<SchoolQR> call, Response<SchoolQR> response) {
+                if (response.isSuccessful()) {
+                    if (response.body().getMESSSAGE().equals("Cannot read property 'TICKET_TIME' of undefined")) {
+                        playError();
+                        Toast.makeText(SchoolBusActivity.this, "오늘 티켓이 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
+                    } else if (response.body().getMESSSAGE().equals("이미 탑승한 티켓입니다.")) {
+                        playError();
+                        Toast.makeText(SchoolBusActivity.this, response.body().getMESSSAGE(), Toast.LENGTH_SHORT).show();
+                    } else if (response.body().getMESSSAGE().equals("티켓 탑승 날짜가 아닙니다.")) {
+                        playError();
+                        Toast.makeText(SchoolBusActivity.this, response.body().getMESSSAGE(), Toast.LENGTH_SHORT).show();
+                    } else if (response.body().getMESSSAGE().equals("티켓 탑승 시간이 아닙니다.")) {
+                        playError();
+                        Toast.makeText(SchoolBusActivity.this, response.body().getMESSSAGE(), Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(SchoolBusActivity.this, response.body().getMESSSAGE(), Toast.LENGTH_SHORT).show();
+                        playCheck();
+                    }
+                } else {
+                    Toast.makeText(SchoolBusActivity.this, "Checked Error", Toast.LENGTH_SHORT).show();
+                    playError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SchoolQR> call, Throwable t) {
+                Toast.makeText(SchoolBusActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                playError();
             }
         });
     }

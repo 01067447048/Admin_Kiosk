@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import kr.ac.hoseo.admin_kiosk.databinding.ActivitySelectBinding;
+import kr.ac.hoseo.admin_kiosk.ui.SchoolBusActivity;
+import kr.ac.hoseo.admin_kiosk.ui.ShuttleBusActivity;
 
 public class SelectActivity extends AppCompatActivity {
 
@@ -82,15 +84,29 @@ public class SelectActivity extends AppCompatActivity {
         });
 
         binding.StartLayout.setOnClickListener(view->{
-            Intent intent = new Intent(this,MainActivity.class);
-            intent.putExtra("type",type);
-            intent.putExtra("campus",campus);
-            intent.putExtra("bus_type",bus_type);
-            if(isCheckedcampus && isCheckedbus && isCheckeddirve){
-                startActivity(intent);
+            if(bus_type.equals("셔틀")){
+                Intent intent = new Intent(this, ShuttleBusActivity.class);
+                intent.putExtra("type",type);
+                intent.putExtra("campus",campus);
+                intent.putExtra("bus_type",bus_type);
+                if(isCheckedcampus && isCheckedbus && isCheckeddirve){
+                    startActivity(intent);
+                }
+                else{
+                    Toast.makeText(SelectActivity.this, "누락된 정보를 확인해 주세요",Toast.LENGTH_SHORT).show();
+                }
             }
-            else{
-                Toast.makeText(SelectActivity.this, "누락된 정보를 확인해 주세요",Toast.LENGTH_SHORT).show();
+            else if(bus_type.equals("통학")){
+                Intent intent = new Intent(this, SchoolBusActivity.class);
+                intent.putExtra("type",type);
+                intent.putExtra("campus",campus);
+                intent.putExtra("bus_type",bus_type);
+                if(isCheckedcampus && isCheckedbus && isCheckeddirve){
+                    startActivity(intent);
+                }
+                else{
+                    Toast.makeText(SelectActivity.this, "누락된 정보를 확인해 주세요",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

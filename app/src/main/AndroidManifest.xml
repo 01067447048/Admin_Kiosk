@@ -3,6 +3,7 @@
     package="kr.ac.hoseo.admin_kiosk">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -23,6 +24,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.SchoolBusActivity"/>
+        <activity android:name=".ui.ShuttleBusActivity"/>
 
     </application>
 
