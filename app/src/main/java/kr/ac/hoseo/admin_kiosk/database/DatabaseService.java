@@ -110,19 +110,10 @@ public class DatabaseService {
             cursor = sqldb.rawQuery("SELECT * FROM Shuttle3",null);
 
             while(cursor.moveToNext()){
-                result += cursor.getString(0);
-            }
-
-            if(result.equals("")){
-                DatabaseReset();
-            }
-            else{
-                cursor.moveToFirst();
                 sid = cursor.getString(0);
                 type = cursor.getString(1);
                 campus = cursor.getString(2);
                 DbTime = cursor.getString(3);
-                DatabaseDelete(DbTime);
                 Date currentTime = Calendar.getInstance().getTime();
                 SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
                 String nowDate = format.format(currentTime);
@@ -164,10 +155,10 @@ public class DatabaseService {
                         DatabaseSelect();
                     }
                 });
-
             }
             cursor.close();
             sqldb.close();
+            DatabaseReset();
         }
         else{
             return;

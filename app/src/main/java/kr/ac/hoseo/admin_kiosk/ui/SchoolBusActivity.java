@@ -120,6 +120,7 @@ public class SchoolBusActivity extends AppCompatActivity {
         binding.btnEnter.setOnClickListener(view -> {
             student_id = binding.getId.getText().toString();
             usingStudentIdSchool(student_id);
+            binding.getId.setText("");
         });
     }
     private void initAnimation() {

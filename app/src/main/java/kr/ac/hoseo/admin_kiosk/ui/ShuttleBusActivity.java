@@ -81,12 +81,6 @@ public class ShuttleBusActivity extends AppCompatActivity {
             public void run() {
                 service.DatabaseInit(getApplicationContext());
                 while (true) {
-                    if(NetworkStatus.getConnectType(getApplicationContext())==-1){
-                        service.DatabaseSelect();
-                    }
-                    else{
-                        service.SendServer();
-                    }
                     try {
                         Thread.sleep(1000);
                     } catch (Exception e) {
@@ -96,10 +90,21 @@ public class ShuttleBusActivity extends AppCompatActivity {
                 }
             }
         }
+        /*class NewRunnable2 implements Runnable{
+            @Override
+            public void run() {
+                while(true){
+                    Log.d("DATABASE","Thread2");
+                }
+            }
+        }*/
 
         NewRunnable nr = new NewRunnable();
         Thread t = new Thread(nr);
         t.start();
+       /* NewRunnable2 nr2 = new NewRunnable2();
+        Thread t2 = new Thread(nr2);
+        t2.start();*/
 
         initAnimation();
 
@@ -143,6 +148,7 @@ public class ShuttleBusActivity extends AppCompatActivity {
             student_id = binding.getId.getText().toString();
             url=letsEncrypt(student_id);
             letsDecrypt(url);
+            binding.getId.setText("");
         });
     }
     private void checkedshuttlelQR(String url) {
@@ -308,6 +314,16 @@ public class ShuttleBusActivity extends AppCompatActivity {
             }
         }catch(UnsupportedEncodingException | BadPaddingException | IllegalBlockSizeException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException e){
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(NetworkStatus.getConnectType(getApplicationContext())==-1){
+        }
+        else if(NetworkStatus.getConnectType(getApplicationContext())==1 || NetworkStatus.getConnectType(getApplicationContext())==2){
+            service.SendServer();
         }
     }
 }
